@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jagdambaa Admin | Booking Dashboard V14</title>
+<link rel="icon" href="assets/jagdambaa-logo.png">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+.v14-login-logo{width:280px!important;height:95px!important;object-fit:contain!important;display:block;margin:0 auto 18px!important}
+.v14-mode{display:inline-flex;align-items:center;gap:6px;border:1px solid #ffffff30;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:800}
+.v14-note{margin-top:12px;padding:11px 12px;border-radius:9px;background:#fff6df;border:1px solid #ecd7a2;color:#6d5521;font-size:10px;line-height:1.55}
+.v14-login-help{font-size:10px!important;color:#687480!important;margin-top:8px!important}
+#dashboardView[hidden],#loginView[hidden]{display:none!important}
+.v14-actions{display:flex;flex-wrap:wrap;gap:6px}
+.v14-actions button{border:1px solid #d7dde2;background:#fff;border-radius:6px;padding:6px 8px;font-size:9px;font-weight:800;cursor:pointer}
+.v14-actions button:hover{border-color:#f28a16}
+.v14-actions .danger{color:#9c2b2b}
+.v14-actions .success{color:#21623c}
+.v14-cloud{background:#eaf7ef;color:#21623c;border-color:#ccebd8}
+.v14-local{background:#fff6df;color:#6d5521;border-color:#ecd7a2}
+</style>
+</head>
+<body class="admin-page">
+<header class="admin-header"><div class="container admin-nav">
+  <div class="admin-brand">Jagdambaa <span>TOURS & TRAVELS • ADMIN V14</span></div>
+  <div class="admin-nav-actions">
+    <span id="modeBadge" class="v14-mode">Checking…</span>
+    <a href="index.html">← Website</a>
+    <button id="logout" hidden>Logout</button>
+  </div>
+</div></header>
+
+<main class="admin-shell"><div class="container">
+
+<section id="loginView" class="admin-login">
+  <div class="login-card">
+    <img class="v14-login-logo" src="assets/jagdambaa-logo.png" alt="Jagdambaa Tours & Travels">
+    <span class="kicker">ADMIN ACCESS</span>
+    <h1>Manage your bookings.</h1>
+    <p id="loginDescription">Use the prototype credentials below while Supabase is not configured.</p>
+    <form id="loginForm">
+      <label>Username / Email<input id="email" autocomplete="username" required placeholder="admin"></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required placeholder="Password"></label>
+      <button class="admin-btn primary full" type="submit">Open Dashboard →</button>
+    </form>
+    <div id="loginMsg" class="login-msg"></div>
+    <div id="demoCredentials" class="v14-note"><b>V14 testing access</b><br>Username: <code>admin</code><br>Password: <code>Jagdambaa@123</code><br><br>This local login is only for testing. Do not use it as production security on a public site.</div>
+  </div>
+</section>
+
+<section id="dashboardView" hidden>
+  <div class="admin-title">
+    <div><span class="kicker">BUSINESS CONTROL</span><h1>Booking Dashboard</h1><p id="syncStatus">Checking booking source…</p></div>
+    <div class="admin-actions">
+      <button class="admin-btn" id="refresh">Refresh</button>
+      <button class="admin-btn" id="notifyAll">Notify Pending</button>
+      <button class="admin-btn" id="demo">Load Demo</button>
+      <button class="admin-btn" id="export">Export CSV</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="admin-panel">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <input id="search" placeholder="Search booking, name, mobile, route…">
+        <select id="filter"><option>All</option><option>Enquiry</option><option>Quoted</option><option>Advance Pending</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option></select>
+        <input id="dateFilter" type="date">
+      </div>
+      <button class="admin-btn" id="reset">Reset</button>
+    </div>
+    <div style="overflow:auto">
+      <table class="booking-table">
+        <thead><tr><th>Booking</th><th>Customer</th><th>Journey</th><th>Date / Time</th><th>Service</th><th>Fare</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="v14-note">
+    <b>V14 workflow:</b> Enquiry → Quoted / Advance Pending → Confirmed → Completed, or Cancelled.
+    <br>Each booking has web-dashboard actions plus WhatsApp and email notification paths.
+  </div>
+</section>
+
+</div></main>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>Edit Booking</h2><button class="close" id="close">×</button></div>
+    <form id="editForm">
+      <input type="hidden" name="booking_id">
+      <div class="modal-grid">
+        <label>Status<select name="status"><option>Enquiry</option><option>Quoted</option><option>Advance Pending</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option></select></label>
+        <label>Fare (₹)<input name="fare" inputmode="decimal"></label>
+        <label>Advance (₹)<input name="advance" inputmode="decimal"></label>
+        <label>Balance (₹)<input name="balance" inputmode="decimal"></label>
+        <label>Customer Name<input name="customer_name"></label>
+        <label>Mobile<input name="customer_phone"></label>
+        <label class="wide">Notes<input name="notes"></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="admin-btn" id="cancel">Cancel</button><button class="admin-btn primary">Save Changes</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="admin-v14.js"></script>
+</body>
+</html>

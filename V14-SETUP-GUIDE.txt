@@ -1,0 +1,93 @@
+JAGDAMBAA TOURS & TRAVELS — VERSION 14
+================================================
+
+V14 is a complete V12-preserving update, not a redesign.
+
+PRESERVED FROM V12
+------------------
+- Responsive business website
+- Multi-step booking form: Trip Details -> Contact -> Review & Send
+- With Driver / Self Drive selection
+- Local / airport / outstation journey fields
+- Booking ID generation
+- Local fallback storage
+- Optional Supabase cloud booking storage
+- WhatsApp booking submission
+- Customer Booking Status page
+- Supabase status lookup function compatibility
+- UPI QR payment section
+- About / services / vehicle / FAQ / contact sections
+- Mobile action bar
+- Existing SEO/schema markup
+
+V14 CORRECTIONS
+---------------
+1. Logo is substantially larger in the header.
+2. Placeholder "Simple fare structure" pricing section removed.
+3. Six new Ertiga images added to a responsive Gallery.
+4. Hero and gallery use the new supplied vehicle photography.
+5. Admin dashboard now opens in prototype mode without Supabase.
+6. Prototype login:
+   Username: admin
+   Password: Jagdambaa@123
+7. If valid Supabase credentials are configured, the same dashboard uses
+   Supabase Auth and the shared bookings table instead.
+8. Admin actions:
+   - Edit
+   - Approve -> Advance Pending
+   - Confirm Payment -> Confirmed
+   - Complete
+   - Reject -> Cancelled
+   - WhatsApp customer notification
+   - Admin email draft
+   - Search / filter / date filter
+   - Refresh
+   - Demo data
+   - CSV export
+9. Customer status lookup remains available.
+10. UPI QR remains available.
+
+TWO APPROVAL / ACCESS PATHS
+---------------------------
+A. Website admin dashboard: direct booking updates.
+B. WhatsApp + email notification paths: the administrator can receive/review
+   the booking and then use the dashboard from phone/laptop.
+
+IMPORTANT ABOUT EMAIL / WHATSAPP
+--------------------------------
+A public static GitHub Pages site cannot silently send email or WhatsApp API
+messages by itself. V14 therefore creates:
+- WhatsApp links for immediate customer communication.
+- mailto: drafts for the configured admin email.
+True automatic email and WhatsApp Business API delivery requires an external
+provider/backend and credentials; it is not faked in this version.
+
+PUBLIC DEPLOYMENT
+-----------------
+The demo admin username/password is client-side and therefore NOT secure for
+real production use. Before accepting real bookings, use Supabase Auth or a
+server-side authentication layer, configure Row Level Security, and remove
+the demo credentials.
+
+SUPABASE
+--------
+V12 SQL files are preserved:
+- supabase-schema.sql
+- supabase-v12.sql
+
+If config.js still contains YOUR-PROJECT / YOUR_SUPABASE placeholders, V14
+automatically uses local prototype mode.
+
+TEST ORDER
+----------
+1. Run: python -m http.server 8000
+2. Open: http://localhost:8000
+3. Test Home, Gallery, Booking, Review & Send.
+4. Test Admin using admin / Jagdambaa@123.
+5. Click Load Demo.
+6. Test Edit -> Approve -> Payment ✓ -> Complete.
+7. Test WhatsApp and Email buttons.
+8. Test Booking Status using a demo Booking ID and mobile.
+9. Only after local testing push V14 to GitHub Pages.
+
+VERSION: V14

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Check Booking Status | Jagdambaa Tours & Travels</title>
+<link rel="icon" href="assets/jagdambaa-logo.png">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+</head>
+<body class="admin-page">
+<header class="admin-header"><div class="container admin-nav">
+<div class="admin-brand">Jagdambaa <span>TOURS & TRAVELS</span></div>
+<div class="admin-nav-actions"><a href="index.html">← Website</a></div>
+</div></header>
+<main class="status-page"><div class="container">
+<div class="status-card">
+<span class="kicker">BOOKING STATUS</span>
+<h1>Check your ride request.</h1>
+<p>Enter the Booking ID and the mobile number used during booking. Your status is read from the shared cloud when Supabase is configured, otherwise from this browser's prototype data.</p>
+<form id="statusForm">
+<label>Booking ID<input id="bookingId" required placeholder="JT-260808-123"></label>
+<label>Mobile Number<input id="bookingPhone" required inputmode="numeric" pattern="[0-9]{10}" placeholder="10-digit mobile"></label>
+<button class="admin-btn primary full" type="submit">Check Status →</button>
+</form>
+<div id="statusResult"></div>
+</div></div></main>
+<script>
+const C=window.JAG_CONFIG||{};
+const CLOUD=!!(window.supabase&&C.SUPABASE_URL&&C.SUPABASE_ANON_KEY&&!C.SUPABASE_URL.includes("YOUR-PROJECT")&&!C.SUPABASE_ANON_KEY.includes("YOUR_SUPABASE"));
+const sb=CLOUD?window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY):null;
+const KEY="jagdambaaBookings";
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const form=document.getElementById("statusForm");
+const result=document.getElementById("statusResult");
+form.addEventListener("submit",async e=>{
+ e.preventDefault();
+ const id=document.getElementById("bookingId").value.trim();
+ const phone=document.getElementById("bookingPhone").value.replace(/\D/g,"");
+ result.innerHTML='<div class="status-loading">Checking booking…</div>';
+ try{
+   let b=null;
+   if(CLOUD){
+     const {data,error}=await sb.rpc("get_booking_status",{p_booking_id:id,p_phone:phone});
+     if(error)throw error;
+     b=(data&&data[0])||null;
+   }else{
+     const list=JSON.parse(localStorage.getItem(KEY)||"[]");
+     b=list.find(x=>(x.booking_id||x.id)===id&&(x.customer_phone||x.phone)===phone);
+   }
+   if(!b){result.innerHTML='<div class="status-error">No booking found. Please check your Booking ID and mobile number.</div>';return;}
+   result.innerHTML=`
+   <div class="status-result">
+    <div class="status-result-head"><div><span>BOOKING ID</span><b>${esc(b.booking_id||b.id)}</b></div><span class="status ${"status-"+String(b.status).toLowerCase().replaceAll(" ","-")}">${esc(b.status)}</span></div>
+    <div class="status-detail"><b>${esc(b.pickup)} → ${esc(b.destination)}</b><span>${esc(b.travel_date||b.date)} • ${esc(b.pickup_time||b.time)}</span></div>
+    <div class="status-detail"><span>Service</span><b>${esc(b.service)}</b></div>
+    ${b.fare?`<div class="status-detail"><span>Confirmed Fare</span><b>₹${esc(b.fare)}</b></div>`:""}
+    ${b.advance?`<div class="status-detail"><span>Advance</span><b>₹${esc(b.advance)}</b></div>`:""}
+    ${b.balance?`<div class="status-detail"><span>Balance</span><b>₹${esc(b.balance)}</b></div>`:""}
+    <div class="status-timeline"><span class="done">Request</span><span class="${["Quoted","Advance Pending","Confirmed","Completed"].includes(b.status)?"done":""}">Quote</span><span class="${["Advance Pending","Confirmed","Completed"].includes(b.status)?"done":""}">Advance</span><span class="${["Confirmed","Completed"].includes(b.status)?"done":""}">Confirmed</span></div>
+   </div>`;
+ }catch(err){console.error(err);result.innerHTML='<div class="status-error">Unable to check status right now. Please contact Jagdambaa Tours & Travels.</div>';}
+});
+</script>
+</body></html>
